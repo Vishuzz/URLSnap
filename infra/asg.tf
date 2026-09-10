@@ -51,6 +51,7 @@ resource "aws_launch_template" "app" {
               User=root
               WorkingDirectory=/opt/url-shortener
               Environment="PORT=8080"
+              Environment="BASE_URL=http://${aws_lb.alb.dns_name}"
               Environment="DB_HOST=${aws_db_instance.mysql.address}"
               Environment="DB_PORT=3306"
               Environment="DB_USER=${var.db_username}"

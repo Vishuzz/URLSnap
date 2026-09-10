@@ -56,15 +56,21 @@ jobs:
 
       - name: Trigger Auto Scaling Group Instance Refresh
         run: |
-          ASG_NAME="${{ secrets.ASG_NAME || 'url-shortener-asg-production' }}"
+          ASG_NAME="${{ secrets.ASG_NAME }}"
+          if [ -z "$ASG_NAME" ]; then
+            ASG_NAME="url-shortener-asg-20260910203237691800000006"
+          fi
           echo "Triggering rolling update on Auto Scaling Group: $ASG_NAME"
           
-          # Check if ASG exists before refreshing
-          if aws autoscaling describe-auto-scaling-groups --auto-scaling-group-names "$ASG_NAME" --query "AutoScalingGroups[0].AutoScalingGroupName" --output text | grep -q "$ASG_NAME"; then
+          # Verify ASG exists on AWS
+          EXISTING_ASG=$(aws autoscaling describe-auto-scaling-groups --auto-scaling-group-names "$ASG_NAME" --query "AutoScalingGroups[0].AutoScalingGroupName" --output text 2>/dev/null || true)
+          
+          if [ "$EXISTING_ASG" = "$ASG_NAME" ]; then
             aws autoscaling start-instance-refresh \
               --auto-scaling-group-name "$ASG_NAME" \
               --preferences '{"MinHealthyPercentage": 50}'
             echo "Instance refresh successfully started!"
           else
-            echo "Warning: Auto Scaling Group '$ASG_NAME' not found or infrastructure not yet applied."
+            echo "Error: Auto Scaling Group '$ASG_NAME' not found on AWS."
+            exit 1
           fi
