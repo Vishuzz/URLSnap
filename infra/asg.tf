@@ -33,6 +33,14 @@ resource "aws_launch_template" "app" {
               mkdir -p /opt/url-shortener
               cd /opt/url-shortener
 
+              # Clone repo and build Go application
+              if [ -d "repo" ]; then
+                rm -rf repo
+              fi
+              git clone https://github.com/Vishuzz/Url-Shortner.git repo
+              cd repo/app
+              go build -o /opt/url-shortener/app main.go
+
               # Write systemd service file
               cat << 'SERVICE' > /etc/systemd/system/url-shortener.service
               [Unit]
@@ -57,7 +65,8 @@ resource "aws_launch_template" "app" {
               SERVICE
 
               systemctl daemon-reload
-              # Note: Binary will be deployed by CI/CD workflow into /opt/url-shortener/app
+              systemctl enable url-shortener
+              systemctl restart url-shortener
               EOF
   )
 
