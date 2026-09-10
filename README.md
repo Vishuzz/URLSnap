@@ -112,3 +112,4 @@ To enable CI/CD deployment, add the following secrets in your GitHub repository:
 | `AWS_SECRET_ACCESS_KEY` | AWS IAM Secret Access Key | `VyDN1lxGN0uEOHx...` |
 | `AWS_REGION` | Target AWS region | `ap-south-1` |
 | `ASG_NAME` | Name of the deployed Auto Scaling Group | *(Output from `terraform output asg_name`)* |
+
