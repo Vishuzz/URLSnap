@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time"
 
 	"url-shortener/handlers"
 	"url-shortener/store"
@@ -33,21 +32,14 @@ func main() {
 	var urlStore store.URLStore
 	var err error
 
-	// Retry connection to DB (useful when DB is starting up in container/EC2)
-	maxRetries := 10
-	for i := 1; i <= maxRetries; i++ {
-		log.Printf("Connecting to MySQL (Attempt %d/%d)...", i, maxRetries)
-		urlStore, err = store.NewMySQLStore(dsn)
-		if err == nil {
-			log.Println("Successfully connected to MySQL database!")
-			break
-		}
-		log.Printf("Database connection attempt failed: %v", err)
-		if i == maxRetries {
-			log.Printf("WARNING: Could not connect to MySQL. Starting server in degraded/standalone mode for testing.")
-		} else {
-			time.Sleep(3 * time.Second)
-		}
+	log.Printf("Connecting to MySQL at %s:%s...", dbHost, dbPort)
+	urlStore, err = store.NewMySQLStore(dsn)
+	if err == nil {
+		log.Println("Successfully connected to MySQL database!")
+	} else {
+		log.Printf("Could not connect to MySQL (%v).", err)
+		log.Println("--> Falling back to In-Memory Store for local dev/testing.")
+		urlStore = store.NewInMemoryStore()
 	}
 
 	server := handlers.NewServer(urlStore, baseURL)
