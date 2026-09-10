@@ -27,7 +27,8 @@ func main() {
 	dbPort := getEnv("DB_PORT", "3306")
 	dbName := getEnv("DB_NAME", "urlshortener")
 
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", dbUser, dbPass, dbHost, dbPort, dbName)
+	// DSN with 5 second connection timeout to prevent blocking server startup
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true&timeout=5s&readTimeout=5s&writeTimeout=5s", dbUser, dbPass, dbHost, dbPort, dbName)
 
 	var urlStore store.URLStore
 	var err error
@@ -38,7 +39,7 @@ func main() {
 		log.Println("Successfully connected to MySQL database!")
 	} else {
 		log.Printf("Could not connect to MySQL (%v).", err)
-		log.Println("--> Falling back to In-Memory Store for local dev/testing.")
+		log.Println("--> Falling back to In-Memory Store for fast health startup.")
 		urlStore = store.NewInMemoryStore()
 	}
 
