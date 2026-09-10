@@ -1,0 +1,70 @@
+name: Build and Deploy URL Shortener
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test-and-build:
+    name: Test and Cross-Compile Go App
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache: true
+          cache-dependency-path: app/go.sum
+
+      - name: Run Go Unit Tests
+        run: |
+          cd app
+          go test -v ./...
+
+      - name: Build Linux AMD64 Binary
+        run: |
+          cd app
+          GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags="-s -w" -o url-shortener-app .
+
+      - name: Upload Binary Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: url-shortener-app-linux-amd64
+          path: app/url-shortener-app
+
+  deploy-aws:
+    name: Trigger AWS ASG Refresh
+    needs: test-and-build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION || 'ap-south-1' }}
+
+      - name: Trigger Auto Scaling Group Instance Refresh
+        run: |
+          ASG_NAME="${{ secrets.ASG_NAME || 'url-shortener-asg-production' }}"
+          echo "Triggering rolling update on Auto Scaling Group: $ASG_NAME"
+          
+          # Check if ASG exists before refreshing
+          if aws autoscaling describe-auto-scaling-groups --auto-scaling-group-names "$ASG_NAME" --query "AutoScalingGroups[0].AutoScalingGroupName" --output text | grep -q "$ASG_NAME"; then
+            aws autoscaling start-instance-refresh \
+              --auto-scaling-group-name "$ASG_NAME" \
+              --preferences '{"MinHealthyPercentage": 50}'
+            echo "Instance refresh successfully started!"
+          else
+            echo "Warning: Auto Scaling Group '$ASG_NAME' not found or infrastructure not yet applied."
+          fi

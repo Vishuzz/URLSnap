@@ -1,0 +1,14 @@
+aws_region          = "ap-south-1"
+environment         = "production"
+vpc_cidr            = "10.0.0.0/16"
+public_subnet_cidrs = ["10.0.1.0/24", "10.0.2.0/24"]
+private_subnet_cidrs = ["10.0.10.0/24", "10.0.20.0/24"]
+availability_zones  = ["ap-south-1a", "ap-south-1b"]
+
+db_name     = "urlshortener"
+db_username = "urluser"
+db_password = "CHANGE_ME_SECURE_PASSWORD_123!"
+
+instance_type  = "t3.micro"
+domain_name    = "" # e.g. "short.example.com"
+hosted_zone_id = "" # e.g. "Z0123456789ABCDEF"

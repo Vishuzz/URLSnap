@@ -1,0 +1,21 @@
+# Go
+app/url-shortener-app
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Terraform
+infra/.terraform/
+infra/.terraform.lock.hcl
+infra/*.tfstate
+infra/*.tfstate.backup
+infra/terraform.tfvars
+
+# OS / IDE
+.DS_Store
+.vscode/
+.idea/
