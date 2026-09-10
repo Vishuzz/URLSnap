@@ -28,18 +28,17 @@ resource "aws_launch_template" "app" {
               set -e
               echo "Starting user_data setup..."
               yum update -y
-              yum install -y golang git
+              yum install -y git
 
               mkdir -p /opt/url-shortener
               cd /opt/url-shortener
 
-              # Clone repo and build Go application
               if [ -d "repo" ]; then
                 rm -rf repo
               fi
               git clone https://github.com/Vishuzz/Url-Shortner.git repo
-              cd repo/app
-              go build -o /opt/url-shortener/app main.go
+              cp repo/app/bin/url-shortener-linux-amd64 /opt/url-shortener/app
+              chmod +x /opt/url-shortener/app
 
               # Write systemd service file
               cat << 'SERVICE' > /etc/systemd/system/url-shortener.service
