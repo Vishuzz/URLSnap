@@ -24,7 +24,7 @@ A high-performance RESTful URL shortener API written in Go, deployed on highly a
 
 ---
 
-## 🚀 Phase 1 — App Code (Go REST API)
+## Phase 1 — App Code (Go REST API)
 
 ### Endpoints
 
@@ -52,7 +52,7 @@ go build -o url-shortener-app .
 
 ---
 
-## 🏗️ Phase 2 — Infra as Code (Terraform)
+## Phase 2 — Infra as Code (Terraform)
 
 All resources are created in AWS Region **`ap-south-1`**:
 
@@ -79,7 +79,7 @@ terraform plan
 
 ---
 
-## ⚙️ Phase 3 — CI/CD Pipeline & GitHub Secrets
+## Phase 3 — CI/CD Pipeline & GitHub Secrets
 
 The `.github/workflows/deploy.yml` pipeline triggers on push to the `main` branch and performs:
 1. Runs Go unit tests (`go test -v ./...`)
@@ -101,7 +101,7 @@ To enable CI/CD deployment, add the following secrets in your GitHub repository:
 
 ---
 
-## 🎨 Phase 4 — Frontend (React + Vite + Tailwind CSS)
+## Phase 4 — Frontend (React + Vite + Tailwind CSS)
 
 A modern, responsive, SaaS-style dark mode web application built in `/frontend`.
 
