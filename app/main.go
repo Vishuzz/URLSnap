@@ -50,9 +50,26 @@ func main() {
 	mux.HandleFunc("/shorten", server.ShortenHandler)
 	mux.HandleFunc("/", server.RedirectHandler)
 
+	handler := corsMiddleware(mux)
+
 	addr := fmt.Sprintf(":%s", port)
 	log.Printf("Starting URL Shortener server on %s", addr)
-	if err := http.ListenAndServe(addr, mux); err != nil {
+	if err := http.ListenAndServe(addr, handler); err != nil {
 		log.Fatalf("Server failed to start: %v", err)
 	}
+}
+
+func corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With")
+
+		if r.Method == http.MethodOptions {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
 }

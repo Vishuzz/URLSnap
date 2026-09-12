@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-serif: 'Playfair Display', Georgia, serif;
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: #faf7f2;
+    color: #1c1917;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .font-serif {
+    font-family: var(--font-serif);
+  }
+
+  .font-mono {
+    font-family: var(--font-mono);
+  }
+}
+
+/* Custom Editorial Sunset Mesh Gradients */
+.bg-sunset-hero {
+  background: 
+    radial-gradient(ellipse at 50% 0%, rgba(122, 59, 46, 0.45) 0%, transparent 65%),
+    radial-gradient(ellipse at 80% 30%, rgba(45, 23, 43, 0.9) 0%, transparent 50%),
+    radial-gradient(ellipse at 20% 40%, rgba(20, 10, 25, 0.95) 0%, transparent 50%),
+    linear-gradient(180deg, #0d0814 0%, #1a0f21 55%, #3d1c23 85%, #faf7f2 100%);
+}
+
+.bg-sunset-card {
+  background: linear-gradient(135deg, rgba(35, 18, 35, 0.92) 0%, rgba(18, 10, 22, 0.96) 100%);
+}
+
+.bg-sunset-bottom {
+  background: 
+    radial-gradient(ellipse at 50% 100%, rgba(122, 59, 46, 0.6) 0%, transparent 70%),
+    linear-gradient(180deg, #1c0e20 0%, #0d0711 100%);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.05); }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 6s ease-in-out infinite;
+}

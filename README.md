@@ -9,30 +9,16 @@ A high-performance RESTful URL shortener API written in Go, deployed on highly a
 ```
 .
 ├── app/                      # Go Application Source Code
-│   ├── go.mod                # Go module specification
-│   ├── go.sum                # Dependencies lockfile
-│   ├── main.go               # HTTP server entrypoint
+│   ├── main.go               # HTTP server entrypoint & CORS middleware
 │   ├── store/                # Database & Base62 code generator logic
-│   │   ├── db.go             # MySQL schema migration & atomic queries
-│   │   ├── generator.go      # Base62 random short code generator
-│   │   └── generator_test.go # Generator unit tests
 │   └── handlers/             # REST HTTP Handlers
-│       ├── handlers.go       # Shorten, Redirect & Health handlers
-│       └── handlers_test.go  # Handler unit tests (with mock store)
+├── frontend/                 # Modern SaaS React + Vite Frontend
+│   ├── src/                  # React components (Navbar, Hero, ShortenForm, ResultCard, QRModal, HistoryList)
+│   ├── .env.example          # Environment config (VITE_API_BASE_URL)
+│   ├── package.json          # Dependencies & scripts
+│   └── vite.config.ts        # Vite & Tailwind CSS configuration
 ├── infra/                    # Terraform Infrastructure (ap-south-1)
-│   ├── provider.tf           # AWS provider configuration
-│   ├── variables.tf          # Configurable variables
-│   ├── vpc.tf                # VPC, 2 Public + 2 Private Subnets, IGW, NAT GW
-│   ├── security_groups.tf    # ALB, EC2, and RDS Security Groups
-│   ├── rds.tf                # Multi-AZ RDS MySQL instance
-│   ├── alb.tf                # Application Load Balancer & Target Group
-│   ├── asg.tf                # Launch Template & Auto Scaling Group
-│   ├── route53.tf            # Route 53 DNS record (optional)
-│   ├── outputs.tf            # Terraform output values
-│   └── terraform.tfvars.example # Sample variables file
-├── .github/
-│   └── workflows/
-│       └── deploy.yml        # GitHub Actions CI/CD Pipeline
+├── .github/                  # CI/CD Workflows
 └── README.md
 ```
 
@@ -112,4 +98,42 @@ To enable CI/CD deployment, add the following secrets in your GitHub repository:
 | `AWS_SECRET_ACCESS_KEY` | AWS IAM Secret Access Key | `VyDN1lxGN0uEOHx...` |
 | `AWS_REGION` | Target AWS region | `ap-south-1` |
 | `ASG_NAME` | Name of the deployed Auto Scaling Group | *(Output from `terraform output asg_name`)* |
+
+---
+
+## 🎨 Phase 4 — Frontend (React + Vite + Tailwind CSS)
+
+A modern, responsive, SaaS-style dark mode web application built in `/frontend`.
+
+### Features
+- **Hero URL Shortener**: Input box with client-side URL validation (`http://` or `https://`), paste helper, and loading states.
+- **Interactive Result Card**: Animated card showing the short code, full short URL, **Copy to Clipboard** button with toast feedback, and **Downloadable QR Code**.
+- **Real-Time Backend Status**: Live badge in header checking `GET /health` to display API connectivity & database mode (`MySQL` or `In-Memory`).
+- **Recent Links History**: Persisted in browser `localStorage` with quick copy actions.
+- **Configurable Backend API**: Controlled via `VITE_API_BASE_URL` environment variable.
+
+### Running Frontend Locally
+
+```bash
+# 1. Navigate to frontend directory
+cd frontend
+
+# 2. Install dependencies
+npm install
+
+# 3. Create .env file (points to local Go backend on port 8080)
+cp .env.example .env
+
+# 4. Start Vite local development server (runs at http://localhost:5173)
+npm run dev
+```
+
+### Production Build
+
+```bash
+cd frontend
+npm run build
+```
+*Outputs compiled production assets to `frontend/dist/`.*
+
 
